@@ -1,0 +1,66 @@
+﻿<Window x:Class="ClientApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClientApp"
+        mc:Ignorable="d"
+        Title="Cards" Height="650" Width="1166"
+        Background="DimGray">
+    <Window.DataContext>
+        <local:AppViewModel/>
+    </Window.DataContext>
+
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+
+        <ListBox x:Name="cardList" ItemsSource="{Binding Cards}" Margin="10"
+                 HorizontalContentAlignment="Stretch"
+                 VerticalContentAlignment="Top"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 SelectionMode="Single"
+                 SelectedIndex="{Binding Index}"
+                 SelectedValue="{Binding SelectedCard}"
+                 SelectionChanged="CardList_SelectionChanged"
+                 Background="Black">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate >
+                    <StackPanel >
+                        <TextBlock  Name="cardDescription" Padding="5" HorizontalAlignment="Center" Text="{Binding Path=Description}" Foreground="WhiteSmoke"/>
+                        <Image Source="{Binding Path=ImageSource}"  Height="250" MaxWidth="250" Margin="0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Height="42" Margin="10,5,22,0" VerticalAlignment="Top">
+            <Button x:Name="addCardButton" Content="+"  Grid.Column="1"   Width="55" Height="27"  Click="AddCardButton_Click"  />
+            <Button x:Name="deleteCardButton" Content="-" Visibility="Collapsed"  Width="55" Height="27" Command="{Binding DeleteCommand}" />
+            <Button x:Name="updateCardButton" Content="Update" Visibility="Collapsed" Grid.Column="1"   Width="55" Height="27" Click="UpdateCardButton_Click"/>
+        </StackPanel>
+
+        <GroupBox Name="newCardForm"  Visibility="Collapsed"  HorizontalAlignment="Left" Height="161" Margin="0,52,0,0" VerticalAlignment="Top" Width="178" Grid.Column="1">
+            <GroupBox.Header>
+                New Data
+            </GroupBox.Header>
+            <StackPanel Margin="0,0,0,0" >
+                <Label Width="138">Description card</Label>
+                <TextBox Name="descrption" Text="{Binding SelectedCard.Description, UpdateSourceTrigger=PropertyChanged ,Mode=TwoWay}" Background="AliceBlue" TextWrapping="Wrap" Canvas.Top="26" Width="166" Height="25" Canvas.Left="10" HorizontalAlignment="Left" />
+                <Button x:Name="BrowseImage" Command="{Binding BrowseCommand}" Content="Brouse image"  Width="166" Height="25" Margin="0,4" HorizontalAlignment="Left" />
+                <Button x:Name="createButton" IsEnabled="True" Content="Create" Width="102" Command="{Binding CreateCommand}" HorizontalAlignment="Left" Margin="4,5,0,4"/>
+                <Button x:Name="updateButton" IsEnabled="true" Content="Update" Command="{Binding UpdateCommand}" Click="UpdateButton_Click" Margin="4,0,60,0"/>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</Window>
