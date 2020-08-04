@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -14,22 +15,27 @@ namespace ClientApp
 {
     class AppViewModel : INotifyPropertyChanged
     {
-        private readonly IMapper mapper = new Mapper(Configuration.GetConfiguration());
-        private readonly ServerApi server = new ServerApi();
+        private readonly IMapper mapper;
+        private readonly ServerApi server;
         private CardModel selectedCard;
+        private bool isReverseOrder;
+        private string sortButtonContent;
 
         public AppViewModel()
         {
+            mapper = new Mapper(Configuration.GetConfiguration());
+            server = new ServerApi();
+            selectedCard = new CardModel();
+            isReverseOrder = false;
+            sortButtonContent = "Sort ↓";
+
             Cards = mapper.Map<List<Card>, BindingList<CardModel>>(server.GetCards());
 
             CreateCommand = new RelayCommand(obj =>
             {
                 try
                 {
-                    if(SelectedCard.Description == "")
-                    {
-                        throw new Exception("Add description");
-                    }
+                    NullValueValidation();
                     server.CreateCard(mapper.Map<Card>(selectedCard));
                     UpdateCardList();
                 }
@@ -43,10 +49,7 @@ namespace ClientApp
             {
                 try
                 {
-                    if (SelectedCard.Description == "")
-                    {
-                        throw new Exception("Add description");
-                    }
+                    NullValueValidation();
                     server.UpdateCard(mapper.Map<Card>(SelectedCard), Index);
                     UpdateCardList();
                 }
@@ -77,8 +80,23 @@ namespace ClientApp
                     MessageBox.Show(ex.Message, "Error");
                 }
             });
-           
-            SelectedCard = new CardModel();
+
+            SortCommand = new RelayCommand(obj =>
+            {
+                if (isReverseOrder == false) 
+                {
+                    GetSortedList(Cards.OrderBy(card => card.Description).ToList());
+                    SortButtonContent = "Sort ↑";
+                    isReverseOrder = true;
+                }
+                else 
+                {
+                    GetSortedList(Cards.OrderByDescending(card => card.Description).ToList());
+                    SortButtonContent = "Sort ↓";
+                    isReverseOrder = false;
+                }
+                SelectedCard = new CardModel();
+            });
         }
 
         public BindingList<CardModel> Cards { get; set; }
@@ -96,6 +114,17 @@ namespace ClientApp
             }
         }
 
+        public string SortButtonContent
+        {
+            get => sortButtonContent;
+
+            set
+            {
+                sortButtonContent = value;
+                OnPropertyChanged(nameof(SortButtonContent));
+            }
+        }
+
         public RelayCommand CreateCommand { get; }
 
         public RelayCommand UpdateCommand { get; }
@@ -104,6 +133,8 @@ namespace ClientApp
 
         public RelayCommand BrowseCommand { get; }
 
+        public RelayCommand SortCommand { get; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged(string propertyNamed = "")
@@ -111,7 +142,7 @@ namespace ClientApp
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyNamed));
         }
     
-        void UpdateCardList()
+        private void UpdateCardList()
         {
             Cards.Clear();
             var newCardsList = mapper.Map<List<Card>, BindingList<CardModel>>(server.GetCards());
@@ -120,6 +151,29 @@ namespace ClientApp
             {
                 Cards.Add(card);
                 SelectedCard = new CardModel();
+            }
+        }
+
+        private BindingList<CardModel> GetSortedList(List<CardModel> sortedList)
+        {
+            Cards.Clear();
+            foreach (var card in sortedList)
+            {
+                Cards.Add(card);
+            }
+
+            return Cards;
+        }
+
+        private void NullValueValidation()
+        {
+            if (SelectedCard.Description == "" || SelectedCard.Description == null)
+            {
+                throw new Exception("Add description");
+            }
+            if (SelectedCard.ImageSource == null)
+            {
+                throw new Exception("Add image");
             }
         }
     }

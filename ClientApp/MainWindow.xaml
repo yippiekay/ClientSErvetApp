@@ -44,10 +44,11 @@
             </ListBox.ItemsPanel>
         </ListBox>
 
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Height="42" Margin="10,5,22,0" VerticalAlignment="Top">
-            <Button x:Name="addCardButton" Content="+"  Grid.Column="1"   Width="55" Height="27"  Click="AddCardButton_Click"  />
-            <Button x:Name="deleteCardButton" Content="-" Visibility="Collapsed"  Width="55" Height="27" Command="{Binding DeleteCommand}" />
-            <Button x:Name="updateCardButton" Content="Update" Visibility="Collapsed" Grid.Column="1"   Width="55" Height="27" Click="UpdateCardButton_Click"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" Height="42" Margin="10,5,0,0" VerticalAlignment="Top" Width="180">
+            <Button x:Name="addCardButton" Content="+"  Grid.Column="1"   Width="35" Height="27"  Click="AddCardButton_Click" Margin="0,8,0,7"  />
+            <Button x:Name="deleteCardButton" Content="-" Visibility="Collapsed"  Width="35" Height="27" Command="{Binding DeleteCommand}" Margin="0,8,0,7" />
+            <Button x:Name="updateCardButton" Content="Update" Visibility="Collapsed" Grid.Column="1"   Width="55" Height="27" Click="UpdateCardButton_Click" Margin="0,8"/>
+            <Button Content="{Binding SortButtonContent, UpdateSourceTrigger=PropertyChanged, Mode=Default}" Width="55" Height="27" Margin="0,8" Command="{Binding SortCommand}"/>
         </StackPanel>
 
         <GroupBox Name="newCardForm"  Visibility="Collapsed"  HorizontalAlignment="Left" Height="161" Margin="0,52,0,0" VerticalAlignment="Top" Width="178" Grid.Column="1">
